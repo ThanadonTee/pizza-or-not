@@ -1,35 +1,40 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react';
 import Axios from 'axios';
+import ParticlesBg from 'particles-bg';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
+import Card from 'react-bootstrap/Card';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './css/main.css';
 
-function App() {
-	Axios({
-		method: 'GET',
-		url: 'http://localhost:5000/',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-	}).then((res) => {
-		console.log(res.data.message);
-	});
-	return (
-		<div className='App'>
-			<header className='App-header'>
-				<img src={logo} className='App-logo' alt='logo' />
-				<p>
-					Edit <code>src/App.js</code> and save to reload.
-				</p>
-				<a
-					className='App-link'
-					href='https://reactjs.org'
-					target='_blank'
-					rel='noopener noreferrer'>
-					Learn React
-				</a>
-			</header>
-		</div>
-	);
+export default class App extends Component {
+	constructor() {
+		super();
+		this.state = {
+			message: null,
+		};
+	}
+	render() {
+		Axios({
+			method: 'GET',
+			url: 'http://localhost:5000/',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		}).then((res) => {
+			this.setState({ message: res.data.message });
+		});
+		return (
+			<>
+				<Row>
+					<Col>
+						<Card>
+							<Card.Body>{this.state.message}</Card.Body>
+						</Card>
+					</Col>
+				</Row>
+				<ParticlesBg color='#ff0000' num={5} type='circle' bg={true} />
+			</>
+		);
+	}
 }
-
-export default App;
