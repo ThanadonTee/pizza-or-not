@@ -5,7 +5,9 @@ const cors = require('cors');
 const compression = require('compression');
 const helmet = require('helmet');
 const session = require('express-session');
+var multer = require('multer');
 
+var upload = multer({ dest: 'uploads/' });
 const app = express();
 
 app.use(cors());
@@ -30,6 +32,6 @@ app.listen(process.env.APP_PORT, () => {
 	);
 });
 
-app.get('/', (req, res, next) => {
-	res.json({ message: 'Test response!' });
+app.post('/', upload.single('data'), (req, res, next) => {
+	res.json({ message: 'Got the file named ' + req.file.filename });
 });

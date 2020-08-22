@@ -2,10 +2,7 @@
 # Edit at https://www.gitignore.io/?templates=node
 
 .DS_Store
-server/uploads/documents/
-server/uploads/pictures/
-public/assets/pictures/
-server/config/config.json
+uploads/*
 
 ### Node ###
 # Logs
