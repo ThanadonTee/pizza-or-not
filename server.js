@@ -5,7 +5,8 @@ const cors = require('cors');
 const compression = require('compression');
 const helmet = require('helmet');
 const session = require('express-session');
-var multer = require('multer');
+const multer = require('multer');
+const fs = require('fs');
 
 var upload = multer({ dest: 'uploads/' });
 const app = express();
@@ -33,5 +34,24 @@ app.listen(process.env.APP_PORT, () => {
 });
 
 app.post('/', upload.single('data'), (req, res, next) => {
-	res.json({ message: 'Got the file named ' + req.file.filename });
+	const { spawn } = require('child_process');
+	const pyProg = spawn('python3', ['python/script.py', req.file.filename]);
+	var output;
+	pyProg.stdout.on('data', function (data) {
+		try {
+			fs.unlinkSync(req.file.path);
+		} catch (err) {
+			console.log(err);
+		}
+		output = data.toString().split('-');
+		if (output[0] == 'not_pizza') {
+			res.json({
+				message: 'This is not a pizza. ' + output[1] + ' confident',
+			});
+		} else {
+			res.json({
+				message: 'This is a pizza. ' + output[1] + '% confident',
+			});
+		}
+	});
 });
