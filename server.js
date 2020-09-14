@@ -50,7 +50,7 @@ app.post('/', upload.single('data'), (req, res, next) => {
 			});
 		} else {
 			res.json({
-				message: 'This is a pizza. ' + output[1] + '% confident',
+				message: 'This is a pizza. ' + output[1] + ' confident',
 			});
 		}
 	});
