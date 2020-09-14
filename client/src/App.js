@@ -6,18 +6,9 @@ import Row from 'react-bootstrap/Row';
 import Card from 'react-bootstrap/Card';
 import Spinner from 'react-bootstrap/Spinner';
 import Image from 'react-bootstrap/Image';
+import Button from 'react-bootstrap/Button';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './css/main.css';
-import ImageUploader from 'react-images-upload';
-
 export default class App extends Component {
-	// constructor() {
-	// 	super();
-	// 	this.state = {
-	// 		message: null,
-	// 	};
-	// }
-
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -27,53 +18,56 @@ export default class App extends Component {
 		};
 		this.onDrop = this.onDrop.bind(this);
 	}
-
-	onDrop(picture, pictureDataURLs) {
-		this.setState(
-			{
-				loading: true,
-				picture: pictureDataURLs[0],
-			},
-			() => {
-				var image = new FormData();
-				image.append('data', picture[0], 'data');
-				Axios({
-					method: 'POST',
-					url: 'http://localhost:5000',
-					data: image,
-					headers: {
-						'Content-Type': 'multipart/form-data',
-					},
-				})
-					.then((res) => {
-						console.log(res);
-						this.setState({
-							message: res.data.message,
-							loading: false,
-						});
+	onDrop = (event) => {
+		if (!event.target.files[0]) {
+		} else {
+			const selectedFile = event.target.files[0];
+			this.setState(
+				{
+					loading: true,
+					picture: URL.createObjectURL(selectedFile),
+					message: '',
+				},
+				() => {
+					var image = new FormData();
+					image.append('data', selectedFile, 'data');
+					Axios({
+						method: 'POST',
+						url: 'http://localhost:5000',
+						data: image,
+						headers: {
+							'Content-Type': 'multipart/form-data',
+						},
 					})
-					.catch((error) => {
-						console.log(error);
-						if (error.request) {
+						.then((res) => {
+							console.log(res);
 							this.setState({
-								message:
-									'There is an error on request with this message : \r\n' +
-									error.message,
+								message: res.data.message,
 								loading: false,
 							});
-						} else if (error.response) {
-							this.setState({
-								message:
-									'There is an error on response with this message : \r\n' +
-									error.response.data,
-								loading: false,
-							});
-						}
-					});
-			}
-		);
-	}
-
+						})
+						.catch((error) => {
+							console.log(error);
+							if (error.request) {
+								this.setState({
+									message:
+										'There is an error on request with this message : \r\n' +
+										error.message,
+									loading: false,
+								});
+							} else if (error.response) {
+								this.setState({
+									message:
+										'There is an error on response with this message : \r\n' +
+										error.response.data,
+									loading: false,
+								});
+							}
+						});
+				}
+			);
+		}
+	};
 	render() {
 		return (
 			<>
@@ -81,42 +75,43 @@ export default class App extends Component {
 					<Row className='justify-content-center align-items-center'>
 						<Col>
 							<Row>
-								{this.state.picture && (
-									<Image
-										src={this.state.picture}
-										fluid
-										style={{ height: '30vh' }}
-									/>
-								)}
+								<Col>
+									{this.state.picture && (
+										<Image
+											src={this.state.picture}
+											fluid
+											style={{ height: '30vh' }}
+										/>
+									)}
+								</Col>
 							</Row>
 							<Row>
-								<ImageUploader
-									withIcon={true}
-									singleImage={true}
-									buttonText='Choose an image'
-									onChange={this.onDrop}
-									imgExtension={[
-										'.jpg',
-										'.gif',
-										'.png',
-										'.gif',
-									]}
-									maxFileSize={5242880}
-								/>
+								<Col>
+									<Button variant='primary' size='lg'>
+										<input
+											type='file'
+											name='file'
+											accept='image/*'
+											onChange={this.onDrop}
+										/>
+									</Button>
+								</Col>
 							</Row>
 						</Col>
 					</Row>
 					<Row className='justify-content-center align-items-center'>
-						<Card>
-							{this.state.message && (
-								<Card.Body>{this.state.message}</Card.Body>
-							)}
-							{this.state.loading && (
-								<Card.Body>
-									<Spinner animation='border' />
-								</Card.Body>
-							)}
-						</Card>
+						{(this.state.message || this.state.loading) && (
+							<Card>
+								{this.state.message && (
+									<Card.Body>{this.state.message}</Card.Body>
+								)}
+								{this.state.loading && (
+									<Card.Body>
+										<Spinner animation='border' />
+									</Card.Body>
+								)}
+							</Card>
+						)}
 					</Row>
 				</Col>
 				<ParticlesBg color='#ff0000' num={5} type='circle' bg={true} />
